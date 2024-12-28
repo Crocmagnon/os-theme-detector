@@ -1,16 +1,23 @@
 .PHONY: build clean install
 
+TERM := $(shell which fish)
+
 build: dist
 	swiftc ./theme-detector.swift -o ./dist/theme-detector
+	sed "s#\~#${HOME}#g;s#TERM#${TERM}#g" info.augendre.os-theme-detector.plist.template > ./dist/info.augendre.os-theme-detector.plist
 
 dist:
 	mkdir -p dist
 
 clean:
-	rm -r dist
+	rm -rf dist
 
 install: build
-	cp ./dist/theme-detector ${HOME}/.local/bin/theme-detector
+	cp ./dist/theme-detector ~/.local/bin/theme-detector
 	mkdir -p ~/Library/LaunchAgents
-	cp ./info.augendre.os-theme-detector.plist ${HOME}/Library/LaunchAgents/
-	launchctl load ${HOME}/Library/LaunchAgents/info.augendre.os-theme-detector.plist
+	cp ./dist/info.augendre.os-theme-detector.plist ~/Library/LaunchAgents/
+	launchctl load ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist
+
+uninstall:
+	launchctl unload ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist
+	rm -f ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist ~/.local/bin/theme-detector /tmp/os-theme-detector.lock

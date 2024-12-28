@@ -6,12 +6,19 @@
     <string>info.augendre.os-theme-detector</string>
     <key>ProgramArguments</key>
     <array>
-        <string>~/.local/bin/os-theme-detector</string>
+        <string>~/.local/bin/theme-detector</string>
+        <string>TERM</string>
+        <string>dark</string>
+        <string>light</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <false/>
+    <key>StandardOutPath</key>
+    <string>/tmp/themeChangeDetector.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/themeChangeDetector.err</string>
 </dict>
 </plist>
 
