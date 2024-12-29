@@ -6,7 +6,7 @@
     <string>info.augendre.os-theme-detector</string>
     <key>ProgramArguments</key>
     <array>
-        <string>~/.local/bin/theme-detector</string>
+        <string>HOME/.local/bin/theme-detector</string>
         <string>TERM</string>
         <string>dark</string>
         <string>light</string>

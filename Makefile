@@ -4,7 +4,7 @@ TERM := $(shell which fish)
 
 build: dist
 	swiftc ./theme-detector.swift -o ./dist/theme-detector
-	sed "s#\~#${HOME}#g;s#TERM#${TERM}#g" info.augendre.os-theme-detector.plist.template > ./dist/info.augendre.os-theme-detector.plist
+	sed "s#HOME#${HOME}#g;s#TERM#${TERM}#g" info.augendre.os-theme-detector.plist.template > ./dist/info.augendre.os-theme-detector.plist
 
 dist:
 	mkdir -p dist
