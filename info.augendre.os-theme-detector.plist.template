@@ -15,10 +15,10 @@
     <true/>
     <key>KeepAlive</key>
     <false/>
-    <key>StandardOutPath</key>
+    <!-- <key>StandardOutPath</key>
     <string>/tmp/themeChangeDetector.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/themeChangeDetector.err</string>
+    <string>/tmp/themeChangeDetector.err</string> -->
 </dict>
 </plist>
 
