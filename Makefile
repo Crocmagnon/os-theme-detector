@@ -21,3 +21,12 @@ install: build
 uninstall:
 	launchctl unload ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist
 	rm -f ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist ~/.local/bin/theme-detector /tmp/os-theme-detector.lock
+
+start:
+	launchctl load ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist
+
+stop:
+	launchctl unload ~/Library/LaunchAgents/info.augendre.os-theme-detector.plist
+
+log:
+	cat /tmp/themeChangeDetector.log

@@ -1,8 +1,16 @@
 import Foundation
+import AppKit
 
 func getSystemAppearance() -> String {
     let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
     return appleInterfaceStyle
+}
+
+func log(_ message: String) {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    let timestamp = dateFormatter.string(from: Date())
+    print("[\(timestamp)] \(message)")
 }
 
 func runShellCommand(shellPath: String, command: String) {
@@ -20,16 +28,16 @@ func runShellCommand(shellPath: String, command: String) {
 
         let output = pipe.fileHandleForReading.readDataToEndOfFile()
         if let outputString = String(data: output, encoding: .utf8) {
-            print("Shell Output: \(outputString)")
+            log("Shell Output: \(outputString)")
         }
     } catch {
-        print("Error running shell command: \(error)")
+        log("Error running shell command: \(error)")
     }
 }
 
 // Parse command-line arguments
 guard CommandLine.arguments.count == 4 else {
-    print("Usage: themeChangeDetector <shellPath> <darkModeCommand> <lightModeCommand>")
+    log("Usage: themeChangeDetector <shellPath> <darkModeCommand> <lightModeCommand>")
     exit(1)
 }
 
@@ -40,7 +48,7 @@ let lightModeCommand = CommandLine.arguments[3]
 func handleThemeChange() {
     let currentAppearance = getSystemAppearance()
 
-    print("System appearance changed to: \(currentAppearance)")
+    log("Appearance: \(currentAppearance)")
 
     if currentAppearance == "Dark" {
         runShellCommand(shellPath: shellPath, command: darkModeCommand)
@@ -54,7 +62,7 @@ let lockFilePath = "/tmp/os-theme-detector.lock"
 let fileManager = FileManager.default
 
 if fileManager.fileExists(atPath: lockFilePath) {
-    print("Another instance is already running. Exiting.")
+    log("Another instance is already running. Exiting.")
     exit(0)
 }
 
@@ -62,33 +70,46 @@ if fileManager.fileExists(atPath: lockFilePath) {
 do {
     try "".write(toFile: lockFilePath, atomically: true, encoding: .utf8)
 } catch {
-    print("Failed to create lock file. Exiting.")
+    log("Failed to create lock file. Exiting.")
     exit(1)
+}
+
+func removeFile() {
+    try? fileManager.removeItem(atPath: lockFilePath)
 }
 
 // Ensure the lock file is deleted when the program exits normally
 atexit {
-    try? fileManager.removeItem(atPath: lockFilePath)
+    removeFile()
 }
 
 // As well as trap SIGINT and SIGTERM signals
 let signalCallback: sig_t = { signal in
-    try? fileManager.removeItem(atPath: lockFilePath)
+    removeFile()
     exit(signal)
 }
 signal(SIGINT, signalCallback)
 signal(SIGTERM, signalCallback)
 
 // Listen for theme changes
-let notificationCenter = DistributedNotificationCenter.default
-notificationCenter.addObserver(
+DistributedNotificationCenter.default.addObserver(
     forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
     object: nil,
     queue: nil) { _ in
+        log("detected systeme theme change")
         handleThemeChange()
     }
 
-print("Initial system appearance: \(getSystemAppearance())")
+// Observer for system wake
+NSWorkspace.shared.notificationCenter.addObserver(
+    forName: NSWorkspace.didWakeNotification,
+    object: nil,
+    queue: nil) { _ in
+        log("detected system wake")
+        handleThemeChange()
+}
+
+log("Initial system appearance: \(getSystemAppearance())")
 
 // Keep the script running to listen for changes
 RunLoop.main.run()
