@@ -6,6 +6,9 @@ build: dist
 	swiftc ./theme-detector.swift -o ./dist/theme-detector
 	sed "s#HOME#${HOME}#g;s#TERM#${TERM}#g" info.augendre.os-theme-detector.plist.template > ./dist/info.augendre.os-theme-detector.plist
 
+run: build
+	./dist/theme-detector ${TERM} dark light
+
 dist:
 	mkdir -p dist
 

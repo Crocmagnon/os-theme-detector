@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 
 func getSystemAppearance() -> String {
     let appleInterfaceStyle = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") ?? "Light"
@@ -95,18 +95,29 @@ signal(SIGTERM, signalCallback)
 DistributedNotificationCenter.default.addObserver(
     forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
     object: nil,
-    queue: nil) { _ in
-        log("detected systeme theme change")
-        handleThemeChange()
-    }
+    queue: nil
+) { _ in
+    log("detected systeme theme change")
+    handleThemeChange()
+}
+
+DistributedNotificationCenter.default.addObserver(
+    forName: NSNotification.Name("com.apple.screenIsUnlocked"),
+    object: nil,
+    queue: nil
+) { _ in
+    log("detected session unlock")
+    handleThemeChange()
+}
 
 // Observer for system wake
 NSWorkspace.shared.notificationCenter.addObserver(
     forName: NSWorkspace.didWakeNotification,
     object: nil,
-    queue: nil) { _ in
-        log("detected system wake")
-        handleThemeChange()
+    queue: nil
+) { _ in
+    log("detected system wake")
+    handleThemeChange()
 }
 
 log("Initial system appearance: \(getSystemAppearance())")
